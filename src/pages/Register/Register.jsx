@@ -3,18 +3,22 @@ import React, { use } from "react";
 import registerAnimation from "../../assets/lotties/register.json";
 import { Link } from "react-router";
 import { AuthContext } from "../../contexts/AuthContext";
+import GoogleLogin from "../Shared/GoogleLogin";
 
 const Register = () => {
   const { createUser } = use(AuthContext);
+
   const handleRegister = (e) => {
     e.preventDefault();
     const form = e.target;
     const email = form.email.value;
     const password = form.password.value;
     createUser(email, password)
-      .then((res) => res.json())
       .then((result) => {
         console.log("user created successful", result);
+      })
+      .catch((error) => {
+        console.log("user created error", error);
       });
   };
   return (
@@ -60,6 +64,9 @@ const Register = () => {
               </Link>
               here
             </p>
+            <div className="">
+              <GoogleLogin />
+            </div>
           </div>
         </div>
       </div>

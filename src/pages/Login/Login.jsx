@@ -1,9 +1,25 @@
 import Lottie from "lottie-react";
-import React from "react";
+import React, { use } from "react";
 import { Link } from "react-router";
 import loginAnimation from "../../assets/lotties/login.json";
+import { AuthContext } from "../../contexts/AuthContext";
+import GoogleLogin from "../Shared/GoogleLogin";
 
 const Login = () => {
+  const { signinUser } = use(AuthContext);
+  const handleLogin = (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const email = form.email.value;
+    const password = form.password.value;
+    signinUser(email, password)
+      .then((result) => {
+        console.log("login successful", result);
+      })
+      .then((error) => {
+        console.log("login failed", error);
+      });
+  };
   return (
     <div className="hero bg-base-200 min-h-screen">
       <div className="hero-content flex-col lg:flex-row-reverse">
@@ -13,7 +29,7 @@ const Login = () => {
         <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
           <div className="card-body">
             <h1 className="text-5xl font-bold">Login here!</h1>
-            <form>
+            <form onSubmit={handleLogin}>
               <fieldset className="fieldset">
                 <label className="label">Email</label>
                 <input
@@ -44,6 +60,8 @@ const Login = () => {
               </Link>
               here
             </p>
+
+            <GoogleLogin />
           </div>
         </div>
       </div>
