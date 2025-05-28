@@ -1,12 +1,15 @@
 import Lottie from "lottie-react";
 import React, { use } from "react";
-import { Link } from "react-router";
+import { Link, Navigate, useLocation, useNavigate } from "react-router";
 import loginAnimation from "../../assets/lotties/login.json";
 import { AuthContext } from "../../contexts/AuthContext";
 import GoogleLogin from "../Shared/GoogleLogin";
 
 const Login = () => {
   const { signinUser } = use(AuthContext);
+  const navigate = useNavigate();
+  const { state } = useLocation();
+  const from = state || "/";
   const handleLogin = (e) => {
     e.preventDefault();
     const form = e.target;
@@ -15,8 +18,9 @@ const Login = () => {
     signinUser(email, password)
       .then((result) => {
         console.log("login successful", result);
+        navigate(from);
       })
-      .then((error) => {
+      .catch((error) => {
         console.log("login failed", error);
       });
   };
@@ -61,7 +65,7 @@ const Login = () => {
               here
             </p>
 
-            <GoogleLogin />
+            <GoogleLogin from={from} />
           </div>
         </div>
       </div>

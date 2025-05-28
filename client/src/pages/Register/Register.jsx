@@ -1,12 +1,13 @@
 import Lottie from "lottie-react";
 import React, { use } from "react";
 import registerAnimation from "../../assets/lotties/register.json";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { AuthContext } from "../../contexts/AuthContext";
 import GoogleLogin from "../Shared/GoogleLogin";
 
 const Register = () => {
   const { createUser } = use(AuthContext);
+  const navigate = useNavigate();
 
   const handleRegister = (e) => {
     e.preventDefault();
@@ -16,6 +17,7 @@ const Register = () => {
     createUser(email, password)
       .then((result) => {
         console.log("user created successful", result);
+        navigate("/");
       })
       .catch((error) => {
         console.log("user created error", error);
