@@ -40,17 +40,22 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/jobs", async (req, res) => {
-      const email = req?.query?.email;
-      const query = {
-        hr_email: email,
-      };
-      const result = await jobCollection.find(query).toArray();
-      res.send(result);
-    });
+    // app.get("/jobs", async (req, res) => {
+    //   const email = req?.query?.email;
+    //   const query = {
+    //     hr_email: email,
+    //   };
+    //   const result = await jobCollection.find(query).toArray();
+    //   res.send(result);
+    // });
 
     app.get("/jobs", async (req, res) => {
-      const result = await jobCollection.find().toArray();
+      const email = req?.query?.email;
+      const query = {};
+      if (email) {
+        query.hr_email = email;
+      }
+      const result = await jobCollection.find(query).toArray();
       res.send(result);
     });
 
@@ -63,9 +68,15 @@ async function run() {
 
     // Application API
     app.get("/applications", async (req, res) => {
-      const email = req?.query?.email;
+      const result = await applicationCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.get("/applications/job/:job_id", async (req, res) => {
+      const job_id = req.params.job_id;
+      console.log("job Id", job_id);
       const query = {
-        email: email,
+        jobId: job_id,
       };
       const result = await applicationCollection.find(query).toArray();
       res.send(result);
