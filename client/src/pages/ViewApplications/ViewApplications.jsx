@@ -1,10 +1,23 @@
 import React from "react";
 import { useLoaderData, useParams } from "react-router";
+import axios from "axios";
 
 const ViewApplications = () => {
   const { job_id } = useParams();
   const applications = useLoaderData();
-  console.log(applications);
+  const handleStatus = (e, app_id) => {
+    console.log(e.target.value, app_id);
+    axios
+      .patch(`http://localhost:3000/applications/${app_id}`, {
+        status: e.target.value,
+      })
+      .then((res) => {
+        console.log("Updated Successful", res.data);
+      })
+      .catch((error) => {
+        console.log("update failed", error);
+      });
+  };
   return (
     <div>
       <h2 className="text-4xl">
@@ -24,16 +37,20 @@ const ViewApplications = () => {
               {/* row 1 */}
               {applications.map((application, index) => (
                 <tr>
-                  {console.log(application)}
                   <th>{index + 1}</th>
                   <td>{application?.email}</td>
                   <td>Quality Control Specialist</td>
                   <td>
-                    <select defaultValue="Select Status" className="select">
+                    <select
+                      onChange={(e) => handleStatus(e, application._id)}
+                      defaultValue={application.status}
+                      className="select"
+                    >
                       <option disabled={true}>Select Status</option>
-                      <option>Crimson</option>
-                      <option>Amber</option>
-                      <option>Velvet</option>
+                      <option>Pending</option>
+                      <option>In Interview</option>
+                      <option>Hired</option>
+                      <option>Rejected</option>
                     </select>
                   </td>
                 </tr>
