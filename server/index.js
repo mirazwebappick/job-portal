@@ -10,6 +10,7 @@ const app = express();
 
 // MiddleWare
 app.use(express.json());
+app.use(cookieParser());
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -17,6 +18,27 @@ app.use(
   })
 );
 
+const logger = (req, res, next) => {
+  console.log("inside the middle logger");
+  next();
+};
+
+const verifyToken = (req, res, next) => {
+  const token = req?.cookies?.token;
+  console.log("token", token);
+  if (!token) {
+    return res.status(401).send({ message: "Unauthorized access" });
+  }
+
+  // verify token
+  jwt.verify(token, process.env.JWT_ACCESS_SECRET, (err, decode) => {
+    if (err) {
+      return res.status(401).send({ message: "Unauthorized access" });
+    }
+    req.decoded = decode;
+    next();
+  });
+};
 // database userName: job_portal
 // database password: SfVN5xcUue7J5ffI
 // emni: 7697510ad4a3adcd3e92ff7c65724c37b01be92fee5a939b01c4c5bc1bc3ba3048449b01d2920f35dcfe651e78231d6aaf139d7c8409675aece09b4442a2688d
@@ -46,7 +68,7 @@ async function run() {
     app.post("/jwt", async (req, res) => {
       const userData = req.body;
       const token = jwt.sign(userData, process.env.JWT_ACCESS_SECRET, {
-        expiresIn: "1h",
+        expiresIn: "3d",
       });
 
       // set token in  the cookies
@@ -92,8 +114,13 @@ async function run() {
     });
 
     // Application API
-    app.get("/applications", async (req, res) => {
-      const result = await applicationCollection.find().toArray();
+    app.get("/applications", logger, verifyToken, async (req, res) => {
+      const email = req.query.email;
+      if (email !== req.decoded.email) {
+        return res.status(403).send({ message: "forbidden access" });
+      }
+      const query = { email: email };
+      const result = await applicationCollection.find(query).toArray();
       res.send(result);
     });
 
